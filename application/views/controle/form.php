@@ -15,31 +15,13 @@
                     <div class="form-group">
                         <label for="crianca" class="control-label col-lg-2">Criança</label>
                         <div class="col-lg-10">
-                            <select id="crianca" name="crianca" style="width: 100%;">
-                                <?php
-                                foreach (evaluate($crianca_list, array()) as $crianca) {
-                                    $selected = $crianca['id'] == $dados['crianca'] ? 'selected' : '';
-                                ?>
-                                <option value="<?php echo $crianca['id']; ?>" <?php echo $selected; ?>><?php echo $crianca['nome']; ?></option>
-                                <?php
-                                }
-                                ?>
-                            </select>
+                            <select id="crianca" name="crianca" class="no-select2" style="width: 100%;"></select>
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="vacina" class="control-label col-lg-2">Vacina</label>
                         <div class="col-lg-10">
-                            <select id="vacina" name="vacina" style="width: 100%;">
-                                <?php
-                                foreach (evaluate($vacina_list, array()) as $vacina) :
-                                    $selected = $vacina['id'] == $dados['vacina'] ? 'selected' : '';
-                                ?>
-                                <option value="<?php echo $vacina['id']; ?>" <?php echo $selected; ?>><?php echo "$vacina[lote] - $vacina[nome]"; ?></option>
-                                <?php
-                                endforeach;
-                                ?>
-                            </select>
+                            <select id="vacina" name="vacina" class="no-select2" style="width: 100%;"></select>
                         </div>
                     </div>
                     <div class="form-group">

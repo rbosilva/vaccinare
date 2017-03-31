@@ -29,11 +29,7 @@ class Controle extends MY_Controller {
     }
     
     public function form() {
-        $crianca_list = $this->crianca->all('nome asc');
-        $vacina_list = $this->vacina->all('data_validade asc, lote desc');
-        $dados = compact('crianca_list', 'vacina_list');
-        formatVars($dados);
-        $this->load->view('controle/form', $dados);
+        $this->load->view('controle/form');
     }
     
     public function save() {
@@ -53,8 +49,9 @@ class Controle extends MY_Controller {
         }
     }
     
-    public function delete($lote = null) {
-        if ($this->controle->delete($lote)) {
+    public function delete($id = null) {
+        $this->check_dose_to_delete($id);
+        if ($this->controle->delete($id)) {
             $this->response();
         } else {
             $error = $this->db->error();
@@ -100,6 +97,75 @@ class Controle extends MY_Controller {
                     $this->response('error', 'Outras Doses desta Vacina já foram cadastradas para esta Criança.');
                 }
         }
+    }
+    
+    public function check_dose_to_delete($id) {
+        $search = filter_var($id, FILTER_SANITIZE_NUMBER_INT);
+        $controle = $this->controle->get($search);
+        if (!empty($controle)) {
+            $doses_aplicadas = $this->controle->get_doses($controle['crianca'], $controle['vacina']);
+            switch ($controle['dose']) {
+                case 'Primeira':
+                    if (in_array('Segunda', $doses_aplicadas, true)) {
+                        $this->response('error', 'É necessário excluir a Segunda Dose antes.');
+                    }
+                case 'Segunda':
+                    if (in_array('Terceira', $doses_aplicadas, true)) {
+                        $this->response('error', 'É necessário excluir a Terceira Dose antes.');
+                    }
+                    break;
+            }
+        }
+    }
+    
+    public function childs() {
+        $datapost = $this->input->post();
+        $where = null;
+        if (!empty($datapost['term'])) {
+            $search = filter_var($datapost['term'], FILTER_SANITIZE_STRING);
+            $where = "nome like '%$search%'";
+        }
+        $page = 0;
+        if (!empty($datapost['page'])) {
+            $page = filter_var($datapost['page'], FILTER_SANITIZE_NUMBER_INT);
+        }
+        $dados = $this->crianca->get_where($where, 'nome asc', 30, 30 * $page);
+        $total_count = $this->crianca->count($where);
+        $result = array();
+        foreach ($dados as $crianca) {
+            $result[] = array(
+                'id' => $crianca['id'],
+                'text' => $crianca['nome']
+            );
+        }
+        echo json_encode(array('dados' => $result, 'total_count' => $total_count));
+    }
+    
+    public function vaccines() {
+        $datapost = $this->input->post();
+        $where = null;
+        if (!empty($datapost['term'])) {
+            $search = filter_var($datapost['term'], FILTER_SANITIZE_STRING);
+            if ($float = toFloatUS($search)) {
+                $search = $float;
+            }
+            $where = "lote like '%$search%' or nome like '%$search%'";
+        }
+        $page = 0;
+        if (!empty($datapost['page'])) {
+            $page = filter_var($datapost['page'], FILTER_SANITIZE_NUMBER_INT);
+        }
+        $dados = $this->vacina->get_where($where, 'lote asc, nome asc', 30, 30 * $page);
+        $total_count = $this->vacina->count($where);
+        $result = array();
+        foreach ($dados as &$vacina) {
+            formatVars($vacina['lote']);
+            $result[] = array(
+                'id' => $vacina['id'],
+                'text' => "$vacina[lote] - $vacina[nome]"
+            );
+        }
+        echo json_encode(array('dados' => $result, 'total_count' => $total_count));
     }
     
 }

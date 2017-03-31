@@ -81,10 +81,7 @@ var Controle = {
                     modal.find('form').find('input, select').prop('disabled', true);
                     modal.find('.form-buttons').hide();
                     System.initializeComponents({
-                        content: modal,
-                        select2: {
-                            disabled: true
-                        }
+                        content: modal
                     });
                     modal.modal('show').on('shown.bs.modal', function () {
                         $(this).find('form').submit(function () {
@@ -108,14 +105,52 @@ var Controle = {
             });
         });
     },
-    form: function (id) {
+    form: function () {
         var self = this;
-        if (typeof id === 'undefined') {
-            id = 0;
-        }
-        $('#page-wrapper').load(self.url('form', id), function () {
+        $('#page-wrapper').load(self.url('form'), function () {
             System.initializeComponents();
-            $('#crianca').focus();
+            $('#crianca').select2({
+                ajax: {
+                    url: self.url('childs'),
+                    dataType: 'json',
+                    type: 'post',
+                    delay: 250,
+                    data: function (params) {
+                        return params;
+                    },
+                    processResults: function (data, params) {
+                        params.page = params.page || 1;
+                        return {
+                            results: data.dados,
+                            pagination: {
+                                more: (params.page * 30) < data.total_count
+                            }
+                        };
+                    },
+                    cache: true
+                }
+            }).focus();
+            $('#vacina').select2({
+                ajax: {
+                    url: self.url('vaccines'),
+                    dataType: 'json',
+                    type: 'post',
+                    delay: 250,
+                    data: function (params) {
+                        return params;
+                    },
+                    processResults: function (data, params) {
+                        params.page = params.page || 1;
+                        return {
+                            results: data.dados,
+                            pagination: {
+                                more: (params.page * 30) < data.total_count
+                            }
+                        };
+                    },
+                    cache: true
+                }
+            });
             $('.form-horizontal').validate({
                 submitHandler: function (form) {
                     self.save(form);
