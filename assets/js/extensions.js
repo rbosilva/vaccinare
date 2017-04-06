@@ -1,9 +1,17 @@
 $.fn.getFormData = function () {
     if (typeof $(this) === 'object' && $(this).is('form')) {
-        var result = {};
+        var result = {},
+            numberUS = false,
+            dateUS = false;
         $(this).find('input, select, textarea').filter('[name]').each(function () {
             if ($(this).is('input:not(:checkbox), select')) {
-                result[$(this).attr('name')] = $(this).val();
+                if (numberUS = toNumberUS($(this).val())) {
+                    result[$(this).attr('name')] = numberUS;
+                } else if (dateUS = toDateUS($(this).val())) {
+                    result[$(this).attr('name')] = dateUS;
+                } else {
+                    result[$(this).attr('name')] = $(this).val();
+                }
             } else if ($(this).is('input:checkbox')) {
                 result[$(this).attr('name')] = $(this).is(':checked') ? 1 : 0;
             } else {

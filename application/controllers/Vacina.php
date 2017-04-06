@@ -34,15 +34,13 @@ class Vacina extends MY_Controller {
     
     public function save() {
         $dados = $this->input->post(null, true);
-        $rules = $this->vacina->get_rules_from_db(empty($dados['id']));
-        foreach ($rules as &$rule) {
-            if ($rule['field'] == 'lote') {
-                $rule['rules'] .= '|is_natural_no_zero';
-                break;
-            }
-        }
-        $this->form_validation->set_rules($rules);
+        $this->form_validation->set_rules($this->vacina->get_rules_from_db(array(
+            'lote' => 'is_natural_no_zero' . (empty($dados['id']) ? '|is_unique[' . $this->vacina->get_table() . '.lote]' : '')
+        )));
         if ($this->form_validation->run()) {
+            if (!empty($dados['id'])) {
+                unset($dados['lote'], $dados['data_validade']);
+            }
             if ($this->vacina->save($dados)) {
                 $this->response('success', 'Registro salvo com sucesso.');
             } else {
@@ -59,6 +57,10 @@ class Vacina extends MY_Controller {
             $this->response();
         } else {
             $error = $this->db->error();
+            if (stripos($error['message'], 'foreign key')) {
+                $this->response('error', 'Este Lote já foi cadastrado no Controle de Vacinas, ' .
+                                         'é necessário excluí-lo do Controle antes.');
+            }
             $this->response('error', $error['message']);
         }
     }

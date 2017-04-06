@@ -16,6 +16,14 @@ function isDateUS(date) {
     return (d && (d.getMonth() + 1) == bits[1] && d.getDate() == Number(bits[2]));
 }
 
+function isTime24h(time) {
+    return /^([0-1]\d|2[0-3]):[0-5]\d$/.test(time);
+}
+
+function isNumberBR(float) {
+    return /^(-)?(\d{1,3})(\.\d{3})*(\,\d{2,})?$/.test(float);
+}
+
 function toDateBR(dateUS) {
     if (!isDateUS(dateUS)) {
         return false;
@@ -32,6 +40,13 @@ function toDateUS(dateBR) {
     return bits[2] + '-' + bits[1] + '-' + bits[0];
 }
 
-function isTime24h(time) {
-    return /^([0-1]\d|2[0-3]):[0-5]\d$/.test(time);
+function toNumberUS(numberBR) {
+    if (isNumberBR(numberBR)) {
+        var replace1 = numberBR.replace(".", ""),
+            replace2 = replace1.replace(",", ".");
+        if ($.isNumeric(replace2)) {
+            return replace2;
+        }
+    }
+    return false;
 }

@@ -34,10 +34,13 @@ class Controle extends MY_Controller {
     
     public function save() {
         $dados = $this->input->post(null, true);
-        $this->form_validation->set_rules($this->controle->get_rules_from_db(true));
+        $this->form_validation->set_rules($this->controle->get_rules_from_db(array(
+            'dose' => 'in_list[Primeira,Segunda,Terceira,Única]'
+        )));
         if ($this->form_validation->run()) {
-            $doses_aplicadas = $this->controle->get_doses($dados['crianca'], $dados['vacina']);
-            $this->check_dose($dados['dose'], $doses_aplicadas);
+            $this->check_child($dados['crianca']);
+            $this->check_vaccine($dados['vacina']);
+            $this->check_dose($dados['crianca'], $dados['vacina'], $dados['dose'], $dados['data']);
             if ($this->controle->save($dados)) {
                 $this->response('success', 'Registro salvo com sucesso.');
             } else {
@@ -59,12 +62,19 @@ class Controle extends MY_Controller {
         }
     }
     
-    public function check_dose($dose, $doses_aplicadas) {
-        if (in_array($dose, $doses_aplicadas)) {
-            $this->response('error', 'A Dose selecionada desta Vacina já foi cadastrada para esta Criança.');
+    public function check_dose($crianca, $vacina, $dose, $data) {
+        $id_crianca = filter_var($crianca, FILTER_SANITIZE_NUMBER_INT);
+        $id_vacina = filter_var($vacina, FILTER_SANITIZE_NUMBER_INT);
+        $query = $this->controle->get_where("id_crianca = $id_crianca and id_vacina = $id_vacina", 'id asc');
+        $doses_aplicadas = array();
+        foreach ($query as $row) {
+            $doses_aplicadas[] = $row['dose'];
         }
         if (in_array('Única', $doses_aplicadas)) {
             $this->response('error', 'A Dose Única desta Vacina já foi cadastrada para esta Criança.');
+        }
+        if (in_array($dose, $doses_aplicadas)) {
+            $this->response('error', "A $dose Dose desta Vacina já foi cadastrada para esta Criança.");
         }
         switch ($dose) {
             case 'Primeira':
@@ -92,10 +102,17 @@ class Controle extends MY_Controller {
                 }
                 break;
             case 'Única':
-                if (in_array('Primeira', $doses_aplicadas) || in_array('Segunda', $doses_aplicadas) ||
-                    in_array('Terceira', $doses_aplicadas)) {
+                if (count($doses_aplicadas)) {
                     $this->response('error', 'Outras Doses desta Vacina já foram cadastradas para esta Criança.');
                 }
+        }
+        $ultima_dose = end($query);
+        if (!empty($ultima_dose)) {
+            $nova_data = strtotime(toDateUS($data));
+            $ultima_data = strtotime($ultima_dose['data']);
+            if ($nova_data <= $ultima_data) {
+                $this->response('error', "Não é possível cadastrar uma Dose antes ou no mesmo dia da última Dose administrada.");
+            }
         }
     }
     
@@ -103,7 +120,11 @@ class Controle extends MY_Controller {
         $search = filter_var($id, FILTER_SANITIZE_NUMBER_INT);
         $controle = $this->controle->get($search);
         if (!empty($controle)) {
-            $doses_aplicadas = $this->controle->get_doses($controle['crianca'], $controle['vacina']);
+            $query = $this->controle->get_where("id_crianca = $controle[crianca] and id_vacina = $controle[vacina]");
+            $doses_aplicadas = array();
+            foreach ($query as $row) {
+                $doses_aplicadas[] = $row['dose'];
+            }
             switch ($controle['dose']) {
                 case 'Primeira':
                     if (in_array('Segunda', $doses_aplicadas, true)) {
@@ -113,8 +134,25 @@ class Controle extends MY_Controller {
                     if (in_array('Terceira', $doses_aplicadas, true)) {
                         $this->response('error', 'É necessário excluir a Terceira Dose antes.');
                     }
-                    break;
             }
+        }
+    }
+    
+    public function check_child($crianca) {
+        $id = filter_var($crianca, FILTER_SANITIZE_NUMBER_INT);
+        if ($this->crianca->count(array('id' => $id)) == 0) {
+            $this->response('error', 'A Criança selecionada não existe.');
+        }
+    }
+    
+    public function check_vaccine($vacina) {
+        $id = filter_var($vacina, FILTER_SANITIZE_NUMBER_INT);
+        $query = $this->vacina->get($id);
+        if (count($query) == 0) {
+            $this->response('error', 'A Vacina selecionada não existe.');
+        }
+        if (strtotime($query['data_validade']) < time()) {
+            $this->response('error', 'A Vacina selecionada já perdeu a validade.');
         }
     }
     
@@ -146,7 +184,7 @@ class Controle extends MY_Controller {
         $where = null;
         if (!empty($datapost['term'])) {
             $search = filter_var($datapost['term'], FILTER_SANITIZE_STRING);
-            if ($float = toFloatUS($search)) {
+            if ($float = toNumberUS($search)) {
                 $search = $float;
             }
             $where = "lote like '%$search%' or nome like '%$search%'";

@@ -10,7 +10,7 @@ class MY_Form_validation extends CI_Form_validation {
     
     public function date($date) {
         $this->_error_messages['date'] = 'Preencha o campo "%s" corretamente.';
-        return isDateBR($date);
+        return isDateUS($date);
     }
     
     public function time($time) {

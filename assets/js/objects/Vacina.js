@@ -51,13 +51,15 @@ var Vacina = {
         });
     },
     form: function (id) {
-        var self = this;
+        var self = this,
+            focus = '#nome';
         if (typeof id === 'undefined') {
             id = 0;
+            focus = '#lote';
         }
         $('#page-wrapper').load(self.url('form', id), function () {
             System.initializeComponents();
-            $('#lote').attr('readonly', id !== 0).focus();
+            $(focus).focus();
             $('.form-horizontal').validate({
                 submitHandler: function (form) {
                     self.save(form);

@@ -18,45 +18,6 @@ if (!function_exists('evaluate')) {
 }
 
 /*
-    Converte $dateUS no formato "YYYY-MM-DD" para "DD/MM/YYYY"
-*/
-if (!function_exists('toDateBR')) {
-    function toDateBR($dateUS) {
-        if (!isDateUS($dateUS)) {
-            return false;
-        }
-        return date('d/m/Y', strtotime($dateUS));
-    }
-}
-
-/*
-    Converte $dateBR no formato "DD/MM/YYYY" para "YYYY-MM-DD"
-*/
-if (!function_exists('toDateUS')) {
-    function toDateUS($dateBR) {
-        if (!isDateBR($dateBR)) {
-            return false;
-        }
-        $bits = explode('/', $dateBR);
-        return date('Y-m-d', strtotime(implode('-', array_reverse($bits))));
-    }
-}
-
-/*
-    Converte $float para o formato americano (ponto para decimais sem separador para milhares)
-*/
-if (!function_exists('toFloatUS')) {
-    function toFloatUS($float) {
-        $replace1 = str_replace('.', '', $float);
-        $replace2 = str_replace(',', '.', $replace1);
-        if (filter_var($replace2, FILTER_VALIDATE_FLOAT)) {
-            return $replace2;
-        }
-        return false;
-    }
-}
-
-/*
     Checa se $date está no formato "DD/MM/YYYY"
 */
 if (!function_exists('isDateBR')) {
@@ -92,6 +53,45 @@ if (!function_exists('isTime24h')) {
 }
 
 /*
+    Converte $dateUS no formato "YYYY-MM-DD" para "DD/MM/YYYY"
+*/
+if (!function_exists('toDateBR')) {
+    function toDateBR($dateUS) {
+        if (!isDateUS($dateUS)) {
+            return false;
+        }
+        return date('d/m/Y', strtotime($dateUS));
+    }
+}
+
+/*
+    Converte $dateBR no formato "DD/MM/YYYY" para "YYYY-MM-DD"
+*/
+if (!function_exists('toDateUS')) {
+    function toDateUS($dateBR) {
+        if (!isDateBR($dateBR)) {
+            return false;
+        }
+        $bits = explode('/', $dateBR);
+        return date('Y-m-d', strtotime(implode('-', array_reverse($bits))));
+    }
+}
+
+/*
+    Converte $float para o formato americano (ponto para decimais sem separador para milhares)
+*/
+if (!function_exists('toNumberUS')) {
+    function toNumberUS($float) {
+        $replace1 = str_replace('.', '', $float);
+        $replace2 = str_replace(',', '.', $replace1);
+        if (filter_var($replace2, FILTER_VALIDATE_FLOAT)) {
+            return $replace2;
+        }
+        return false;
+    }
+}
+
+/*
     Formata os tipos de dados para exibição na tela
 */
 if (!function_exists('formatVars')) {
@@ -122,7 +122,7 @@ if (!function_exists('format_params')) {
         $where = null;
         if (!empty($params['search']['value'])) {
             $search_value = filter_var($params['search']['value'], FILTER_SANITIZE_STRING);
-            if ($float = toFloatUS($search_value)) {
+            if ($float = toNumberUS($search_value)) {
                 $search_value = $float;
             }
             foreach ($params['columns'] as $column) {
@@ -137,17 +137,20 @@ if (!function_exists('format_params')) {
             foreach ($params['order'] as $field) {
                 $column_position = (int) filter_var($field['column'], FILTER_SANITIZE_NUMBER_INT);
                 if ($params['columns'][$column_position]['orderable'] === 'true') {
-                    $column = $params['columns'][$column_position]['data'];
+                    $column = filter_var($params['columns'][$column_position]['data'], FILTER_SANITIZE_STRING);
                     $dir = filter_var($field['dir'], FILTER_SANITIZE_STRING);
                     $order_by[] = "$column $dir";
                 }
             }
             $order_by = implode(', ', $order_by);
         }
+        $draw = (int) filter_var($params['draw'], FILTER_SANITIZE_NUMBER_INT);
+        $length = (int) filter_var($params['length'], FILTER_SANITIZE_NUMBER_INT);
+        $start = (int) filter_var($params['start'], FILTER_SANITIZE_NUMBER_INT);
         return array(
-            'draw' => (int) filter_var($params['draw'], FILTER_SANITIZE_NUMBER_INT),
-            'length' => (int) filter_var($params['length'], FILTER_SANITIZE_NUMBER_INT),
-            'start' => (int) filter_var($params['start'], FILTER_SANITIZE_NUMBER_INT),
+            'draw' => $draw,
+            'length' => $length,
+            'start' => $start,
             'where' => $where,
             'order_by' => $order_by
         );

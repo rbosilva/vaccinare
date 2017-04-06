@@ -15,3 +15,7 @@ $.validator.addMethod('dateBR', function (value, element) {
 $.validator.addMethod('time24h', function (value, element) {
     return this.optional(element) || isTime24h(value);
 });
+
+$.validator.addMethod('numberBR', function (value, element) {
+    return this.optional(element) || isNumberBR(value);
+});

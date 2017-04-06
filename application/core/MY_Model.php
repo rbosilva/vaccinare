@@ -6,6 +6,7 @@ class MY_Model extends CI_Model {
 
     private $table;
     private $index;
+    private $rules;
     
     public function __construct() {
         parent::__construct();
@@ -23,7 +24,7 @@ class MY_Model extends CI_Model {
         }
     }
     
-    protected function get_table() {
+    public function get_table() {
         return $this->table;
     }
     
@@ -33,18 +34,19 @@ class MY_Model extends CI_Model {
         }
     }
     
-    protected function get_index() {
+    public function get_index() {
         return $this->index;
     }
     
+    protected function set_rules(array $rules) {
+        $this->rules = $rules;
+    }
+    
+    public function get_rules() {
+        return $this->rules;
+    }
+    
     public function save(array $data, $return_rows_updated = false) {
-        foreach ($data as &$value) {
-            if (isDateBR($value)) {
-                $value = toDateUS($value);
-            } else if ($float = toFloatUS($value)) {
-                $value = $float;
-            }
-        }
         if (!empty($data) && is_array($data)) {
             if (isset($data[$this->index])) {
                 $index = $data[$this->index];
@@ -119,48 +121,44 @@ class MY_Model extends CI_Model {
         return $this->db->query("SHOW COLUMNS FROM $this->table")->result();
     }
     
-    // Especifica as regras de validação de cada campo através de informações das colunas da tabela
-    // o parâmetro $is_inserting só precisa ser passado caso haja um índex "unique" em $this->table
-    public function get_rules_from_db($is_inserting = true) {
-        $return = array();
+    public function get_rules_from_db(array $additional_rules = array()) {
+        $integer_types = array('INTEGER', 'INT', 'SMALLINT', 'TINYINT', 'MEDIUMINT', 'BIGINT');
+        $float_types = array('DECIMAL', 'NUMERIC', 'FLOAT', 'DOUBLE');
         $columns = $this->columns();
+        $return = array();
         foreach ($columns as $column) {
-            if (!is_array($column) || strtolower($column['Field']) == strtolower($this->index)) {
-                continue;
-            }
             $field = $column['Field'];
             $label = ucwords(str_replace('_', ' ', $field));
-            $rules = '';
-            if (strtoupper($column['Null']) == 'NO') {
-                $rules = 'required|';
+            $type = '';
+            $length = null;
+            sscanf($column['Type'], '%[a-z](%d)', $type, $length);
+            $rules = array();
+            if (strtoupper($column['Null']) == 'NO' && strtoupper($field) != strtoupper($this->index)) {
+                $rules[] = 'required';
             }
-            if (strtoupper($column['Key']) == 'UNI' && $is_inserting) {
-                $rules .= "is_unique[$this->table.$column[Field]]|";
+            if (in_array(strtoupper($type), $integer_types, true)) {
+                $rules[] = 'integer';
+            } else if (in_array(strtoupper($type), $float_types, true)) {
+                $rules[] = 'numeric';
+            } else if (strtoupper($type) == 'DATE') {
+                $rules[] = 'date';
+            } else if (strtoupper($type) == 'TIME') {
+                $rules[] = 'time';
             }
-            foreach (array('INTEGER', 'INT', 'SMALLINT', 'TINYINT', 'MEDIUMINT', 'BIGINT') as $integer_types) {
-                if (strpos(strtoupper($column['Type']), $integer_types) !== false) {
-                    $rules .= 'integer|';
-                    break;
-                }
+            if (!is_null($length)) {
+                $rules[] = "max_length[$length]";
             }
-            if (strpos($rules, 'integer') === false) {
-                foreach (array('DECIMAL', 'NUMERIC', 'FLOAT', 'DOUBLE') as $fixed_floating_types) {
-                    if (strpos(strtoupper($column['Type']), $fixed_floating_types) !== false) {
-                        $rules .= 'numeric|';
-                        break;
+            if (!empty($additional_rules)) {
+                foreach ($additional_rules as $key => $value) {
+                    if (strtoupper($key) == strtoupper($field)) {
+                        $rules[] = $value;
                     }
                 }
-            }
-            if (strtoupper($column['Type']) == 'DATE') {
-                $rules .= 'date|';
-            }
-            if (strtoupper($column['Type']) == 'TIME') {
-                $rules .= 'time|';
             }
             $return[] = array(
                 'field' => $field,
                 'label' => $label,
-                'rules' => substr($rules, 0, -1)
+                'rules' => implode('|', $rules)
             );
         }
         return $return;

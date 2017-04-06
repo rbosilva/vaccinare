@@ -7,9 +7,7 @@
             </div>
             <div class="modal-body">
                 <div class="container row-fluid">
-                    <label>
-                        <?php echo htmlentities($msg) ?>
-                    </label>
+                    <?php echo $msg ?>
                 </div>
             </div>
             <div class="modal-footer">

@@ -3,10 +3,11 @@ $.validator.setDefaults({
         e.preventDefault();
         var message = '',
             name = '';
-        $('input, select, textarea').removeClass($.validator.defaults.errorClass);// Default "error", se mudá-la, troque também no CSS
+        $('input, select, textarea, span.select2 .select2-selection').removeClass($.validator.defaults.errorClass);
         $.each(validator.errorList, function (key, value) {
             $(value.element).addClass($.validator.defaults.errorClass);
-            name = $('.control-label[for=' + $(value.element).attr('id') + ']').text();
+            $(value.element).next('span.select2').find('.select2-selection').addClass($.validator.defaults.errorClass);
+            name = $(value.element).closest('.form-group').find('.control-label[for=' + $(value.element).attr('id') + ']').text();
             message += '<b>' + name + '</b> - ' + value.message + '<br>';
         });
         System.alert({

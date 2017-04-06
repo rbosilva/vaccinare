@@ -58,17 +58,4 @@ class Controle_Model extends MY_Model {
         return $this->db->count_all_results("($sql) as base");
     }
     
-    public function get_doses($crianca, $vacina) {
-        $this->db->select('dose');
-        $this->db->from($this->get_table());
-        $this->db->where('crianca', $crianca);
-        $this->db->where('vacina', $vacina);
-        $query = $this->db->get()->result_array();
-        $result = array();
-        foreach ($query as $dose) {
-            $result[] = $dose['dose'];
-        }
-        return $result;
-    }
-    
 }

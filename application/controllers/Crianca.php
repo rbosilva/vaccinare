@@ -34,7 +34,10 @@ class Crianca extends MY_Controller {
     
     public function save() {
         $dados = $this->input->post(null, true);
-        $this->form_validation->set_rules($this->crianca->get_rules_from_db());
+        $this->form_validation->set_rules($this->crianca->get_rules_from_db(array(
+            'sexo' => 'in_list[M,F]',
+            'cor_etnia' => 'in_list[Branca,Negra,Parda,Indígena,Amarela]'
+        )));
         if ($this->form_validation->run()) {
             if ($this->crianca->save($dados)) {
                 $this->response('success', 'Registro salvo com sucesso.');
@@ -52,6 +55,10 @@ class Crianca extends MY_Controller {
             $this->response();
         } else {
             $error = $this->db->error();
+            if (stripos($error['message'], 'foreign key')) {
+                $this->response('error', 'Esta Criança já foi cadastrada no Controle de Vacinas, ' .
+                                         'é necessário excluí-la do Controle antes.');
+            }
             $this->response('error', $error['message']);
         }
     }

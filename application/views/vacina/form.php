@@ -15,7 +15,7 @@
                     <div class="form-group">
                         <label for="lote" class="control-label col-lg-2">Lote</label>
                         <div class="col-lg-10">
-                            <input type="text" id="lote" name="lote" class="form-control"
+                            <input type="text" id="lote" name="lote" class="form-control" <?php echo isset($id) ? 'disabled' : ''; ?>
                                 value="<?php echo evaluate($lote); ?>" data-mask="0000000">
                         </div>
                     </div>
@@ -29,7 +29,8 @@
                         <label for="data-validade" class="control-label col-lg-2">Validade</label>
                         <div class="col-lg-10">
                             <input type="text" id="data-validade" name="data_validade" data-mask="00/00/0000" class="form-control"
-                                data-date-format="dd/mm/yyyy" value="<?php echo evaluate($data_validade, date('d/m/Y')); ?>">
+                                data-date-format="dd/mm/yyyy" value="<?php echo evaluate($data_validade, date('d/m/Y')); ?>"
+                                <?php echo isset($id) ? 'disabled' : ''; ?>>
                         </div>
                     </div>
                     <div class="form-group">
