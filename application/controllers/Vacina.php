@@ -23,24 +23,16 @@ class Vacina extends MY_Controller {
         }
     }
     
-    public function form($id = null) {
-        $dados = array();
-        if (!empty($id)) {
-            $dados = $this->vacina->get($id);
-        }
-        formatVars($dados);
-        $this->load->view('vacina/form', $dados);
+    public function form() {
+        $this->load->view('vacina/form');
     }
     
     public function save() {
         $dados = $this->input->post(null, true);
         $this->form_validation->set_rules($this->vacina->get_rules_from_db(array(
-            'lote' => 'is_natural_no_zero' . (empty($dados['id']) ? '|is_unique[' . $this->vacina->get_table() . '.lote]' : '')
+            'nome' => 'is_unique[' . $this->vacina->get_table() . '.nome]'
         )));
         if ($this->form_validation->run()) {
-            if (!empty($dados['id'])) {
-                unset($dados['lote'], $dados['data_validade']);
-            }
             if ($this->vacina->save($dados)) {
                 $this->response('success', 'Registro salvo com sucesso.');
             } else {
@@ -58,8 +50,8 @@ class Vacina extends MY_Controller {
         } else {
             $error = $this->db->error();
             if (stripos($error['message'], 'foreign key')) {
-                $this->response('error', 'Este Lote já foi cadastrado no Controle de Vacinas, ' .
-                                         'é necessário excluí-lo do Controle antes.');
+                $this->response('error', 'Esta Vacina já foi cadastrada no Controle de Vacinas, ' .
+                                         'é necessário excluir seu vínculo antes.');
             }
             $this->response('error', $error['message']);
         }

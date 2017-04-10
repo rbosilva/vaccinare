@@ -89,19 +89,6 @@ var Controle = {
                         });
                     });
                 });
-            }).on('click', '.visualizar-vacina', function (e) {
-                e.preventDefault();
-                var id = $(this).data('id-vacina');
-                $.post(System.base_url('vacina/form/' + id), function (html) {
-                    var modal = self.modal('Visualizar Vacina', $(html).find('.panel-body').html());
-                    modal.find('form').find('input').prop('disabled', true);
-                    modal.find('.form-buttons').hide();
-                    modal.modal('show').on('shown.bs.modal', function () {
-                        $(this).find('form').submit(function () {
-                            return false;
-                        });
-                    });
-                });
             });
         });
     },
@@ -115,6 +102,7 @@ var Controle = {
                     dataType: 'json',
                     type: 'post',
                     delay: 250,
+                    cache: true,
                     data: function (params) {
                         return params;
                     },
@@ -126,8 +114,7 @@ var Controle = {
                                 more: (params.page * 30) < data.total_count
                             }
                         };
-                    },
-                    cache: true
+                    }
                 }
             }).focus();
             $('#vacina').select2({
@@ -136,6 +123,7 @@ var Controle = {
                     dataType: 'json',
                     type: 'post',
                     delay: 250,
+                    cache: true,
                     data: function (params) {
                         return params;
                     },
@@ -147,8 +135,7 @@ var Controle = {
                                 more: (params.page * 30) < data.total_count
                             }
                         };
-                    },
-                    cache: true
+                    }
                 }
             });
             $('.form-horizontal').validate({

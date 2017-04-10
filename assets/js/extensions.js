@@ -39,34 +39,3 @@ $.fn.outerHtml = function () {
     }
     return false;
 };
-
-(function ($) {
-    $.fn.load = function (url, params, callback) {
-        var self = this,
-            split = url.split(' '),
-            url = split.shift(),
-            selector = split.join(' '),
-            data = null,
-            complete = null;
-        if ($.isFunction(params)) {
-            complete = params;
-        } else {
-            data = params;
-            if ($.isFunction(callback)) {
-                complete = callback;
-            }
-        }
-        $.get(url, data, function (html) {
-            if (html === 'session_expired') {
-                document.location.replace(System.base_url());
-            } else {
-                if (selector !== '') {
-                    html = $('<div>' + html + '</div>').find(selector).outerHtml();
-                }
-                self.html(html);
-                complete(html);
-            }
-        }, 'html');
-        return this;
-    };
-})(jQuery);

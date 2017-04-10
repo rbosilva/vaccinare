@@ -15,11 +15,7 @@
                 <table class="table table-striped table-bordered table-hover">
                     <thead>
                         <tr>
-                            <th width="60">Lote</th>
                             <th>Nome</th>
-                            <th width="60">Validade</th>
-                            <th>Fornecedor</th>
-                            <th width="30" class="no-sort">Editar</th>
                             <th width="30" class="no-sort">Excluir</th>
                         </tr>
                     </thead>

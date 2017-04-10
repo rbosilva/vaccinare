@@ -25,6 +25,12 @@ $(function() {
         }
     });
 
+    $(document).ajaxComplete(function () {
+        if (arguments[1].responseText == 'session_expired') {
+            document.location.replace(System.base_url());
+        }
+    });
+
     $('body').on('click', '.sidebar a[data-object], .quick-actions button, .breadcrumb a[data-object]', function (e) {
         e.preventDefault();
         var objeto = $(this).data('object'),

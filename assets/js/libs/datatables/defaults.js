@@ -34,3 +34,4 @@ $.extend($.fn.dataTable.defaults, {
         }
     }
 });
+$.fn.dataTable.ext.errMode = 'none';

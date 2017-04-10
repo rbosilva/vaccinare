@@ -21,7 +21,6 @@ class Controle extends MY_Controller {
             formatVars($data, array('id', 'id_crianca', 'id_vacina'));
             echo formatResults($data, $count_all, $count_filtered, $params['draw'], function (&$row) {
                 $row['crianca'] = "<a href='#' title='Visualizar Criança' class='visualizar-crianca' data-id-crianca='$row[id_crianca]'>$row[crianca]</a>";
-                $row['vacina'] = "<a href='#' title='Visualizar Vacina' class='visualizar-vacina' data-id-vacina='$row[id_vacina]'>$row[vacina]</a>";
             });
         } else {
             $this->load->view('controle/list');
@@ -63,8 +62,8 @@ class Controle extends MY_Controller {
     }
     
     public function check_dose($crianca, $vacina, $dose, $data) {
-        $id_crianca = filter_var($crianca, FILTER_SANITIZE_NUMBER_INT);
-        $id_vacina = filter_var($vacina, FILTER_SANITIZE_NUMBER_INT);
+        $id_crianca = (int) filter_var($crianca, FILTER_SANITIZE_NUMBER_INT);
+        $id_vacina = (int) filter_var($vacina, FILTER_SANITIZE_NUMBER_INT);
         $query = $this->controle->get_where("id_crianca = $id_crianca and id_vacina = $id_vacina", 'id asc');
         $doses_aplicadas = array();
         foreach ($query as $row) {
@@ -111,13 +110,13 @@ class Controle extends MY_Controller {
             $nova_data = strtotime(toDateUS($data));
             $ultima_data = strtotime($ultima_dose['data']);
             if ($nova_data <= $ultima_data) {
-                $this->response('error', "Não é possível cadastrar uma Dose antes ou no mesmo dia da última Dose administrada.");
+                $this->response('error', 'Não é possível cadastrar uma Dose para a mesma Vacina antes ou no mesmo dia da última Dose administrada.');
             }
         }
     }
     
     public function check_dose_to_delete($id) {
-        $search = filter_var($id, FILTER_SANITIZE_NUMBER_INT);
+        $search = (int) filter_var($id, FILTER_SANITIZE_NUMBER_INT);
         $controle = $this->controle->get($search);
         if (!empty($controle)) {
             $query = $this->controle->get_where("id_crianca = $controle[crianca] and id_vacina = $controle[vacina]");
@@ -139,20 +138,16 @@ class Controle extends MY_Controller {
     }
     
     public function check_child($crianca) {
-        $id = filter_var($crianca, FILTER_SANITIZE_NUMBER_INT);
+        $id = (int) filter_var($crianca, FILTER_SANITIZE_NUMBER_INT);
         if ($this->crianca->count(array('id' => $id)) == 0) {
             $this->response('error', 'A Criança selecionada não existe.');
         }
     }
     
     public function check_vaccine($vacina) {
-        $id = filter_var($vacina, FILTER_SANITIZE_NUMBER_INT);
-        $query = $this->vacina->get($id);
-        if (count($query) == 0) {
+        $id = (int) filter_var($vacina, FILTER_SANITIZE_NUMBER_INT);
+        if ($this->vacina->count(array('id' => $id)) == 0) {
             $this->response('error', 'A Vacina selecionada não existe.');
-        }
-        if (strtotime($query['data_validade']) < time()) {
-            $this->response('error', 'A Vacina selecionada já perdeu a validade.');
         }
     }
     
@@ -165,7 +160,7 @@ class Controle extends MY_Controller {
         }
         $page = 0;
         if (!empty($datapost['page'])) {
-            $page = filter_var($datapost['page'], FILTER_SANITIZE_NUMBER_INT);
+            $page = (int) filter_var($datapost['page'], FILTER_SANITIZE_NUMBER_INT);
         }
         $dados = $this->crianca->get_where($where, 'nome asc', 30, 30 * $page);
         $total_count = $this->crianca->count($where);
@@ -184,23 +179,19 @@ class Controle extends MY_Controller {
         $where = null;
         if (!empty($datapost['term'])) {
             $search = filter_var($datapost['term'], FILTER_SANITIZE_STRING);
-            if ($float = toNumberUS($search)) {
-                $search = $float;
-            }
-            $where = "lote like '%$search%' or nome like '%$search%'";
+            $where = "nome like '%$search%'";
         }
         $page = 0;
         if (!empty($datapost['page'])) {
-            $page = filter_var($datapost['page'], FILTER_SANITIZE_NUMBER_INT);
+            $page = (int) filter_var($datapost['page'], FILTER_SANITIZE_NUMBER_INT);
         }
-        $dados = $this->vacina->get_where($where, 'lote asc, nome asc', 30, 30 * $page);
+        $dados = $this->vacina->get_where($where, 'nome asc', 30, 30 * $page);
         $total_count = $this->vacina->count($where);
         $result = array();
         foreach ($dados as &$vacina) {
-            formatVars($vacina['lote']);
             $result[] = array(
                 'id' => $vacina['id'],
-                'text' => "$vacina[lote] - $vacina[nome]"
+                'text' => $vacina['nome']
             );
         }
         echo json_encode(array('dados' => $result, 'total_count' => $total_count));

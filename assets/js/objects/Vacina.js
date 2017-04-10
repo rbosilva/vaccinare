@@ -1,17 +1,8 @@
 var Vacina = {
     rules: {
-        lote: {
+        nome: {
             required: true,
-            digits: true,
-            min: 1
-        },
-        nome: 'required',
-        data_validade: {
-            required: true,
-            dateBR: true
-        },
-        fornecedor: {
-            required: true
+            maxlength: 100
         }
     },
     url: function (method, params) {
@@ -29,11 +20,7 @@ var Vacina = {
                         type: "POST"
                     },
                     columns: [
-                        {data: "lote"},
                         {data: "nome"},
-                        {data: "data_validade"},
-                        {data: "fornecedor"},
-                        {data: "editar"},
                         {data: "excluir"}
                     ]
                 }
@@ -41,25 +28,17 @@ var Vacina = {
             $('.novo').click(function () {
                 self.form();
             });
-            $('table.table').on('click', '.editar', function (e) {
-                e.preventDefault();
-                self.form($(this).get_tr_data('id'));
-            }).on('click', '.excluir', function (e) {
+            $('table.table').on('click', '.excluir', function (e) {
                 e.preventDefault();
                 self.delete($(this).get_tr_data('id'));
             });
         });
     },
-    form: function (id) {
-        var self = this,
-            focus = '#nome';
-        if (typeof id === 'undefined') {
-            id = 0;
-            focus = '#lote';
-        }
-        $('#page-wrapper').load(self.url('form', id), function () {
+    form: function () {
+        var self = this;
+        $('#page-wrapper').load(self.url('form'), function () {
             System.initializeComponents();
-            $(focus).focus();
+            $('#nome').focus();
             $('.form-horizontal').validate({
                 submitHandler: function (form) {
                     self.save(form);
@@ -83,7 +62,7 @@ var Vacina = {
     delete: function (id) {
         var self = this;
         System.confirm({
-            title: 'Excluir Lote',
+            title: 'Excluir Vacina',
             msg: 'Deseja realmente excluir este registro?',
             onConfirm: function () {
                 $.post(self.url('delete/' + id), function (json) {

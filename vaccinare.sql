@@ -3,8 +3,8 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: 06-Abr-2017 às 22:20
--- Versão do servidor: 10.1.13-MariaDB
+-- Generation Time: Apr 07, 2017 at 03:10 
+-- Server version: 10.1.13-MariaDB
 -- PHP Version: 5.6.20
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
@@ -25,7 +25,7 @@ USE `vaccinare`;
 -- --------------------------------------------------------
 
 --
--- Estrutura da tabela `controle_vacinas`
+-- Table structure for table `controle_vacinas`
 --
 
 CREATE TABLE `controle_vacinas` (
@@ -38,18 +38,19 @@ CREATE TABLE `controle_vacinas` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Extraindo dados da tabela `controle_vacinas`
+-- Dumping data for table `controle_vacinas`
 --
 
 INSERT INTO `controle_vacinas` (`id`, `data`, `horario`, `crianca`, `vacina`, `dose`) VALUES
 (1, '2017-04-06', '17:19:00', 1, 1, 'Primeira'),
 (2, '2017-04-06', '17:19:00', 2, 2, 'Primeira'),
-(3, '2017-04-06', '17:20:00', 1, 3, 'Primeira');
+(3, '2017-04-06', '17:20:00', 1, 3, 'Primeira'),
+(4, '2017-04-07', '10:04:00', 1, 2, 'Primeira');
 
 -- --------------------------------------------------------
 
 --
--- Estrutura da tabela `criancas`
+-- Table structure for table `criancas`
 --
 
 CREATE TABLE `criancas` (
@@ -63,7 +64,7 @@ CREATE TABLE `criancas` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Extraindo dados da tabela `criancas`
+-- Dumping data for table `criancas`
 --
 
 INSERT INTO `criancas` (`id`, `nome`, `idade`, `sexo`, `parto_natural`, `mae`, `cor_etnia`) VALUES
@@ -73,7 +74,7 @@ INSERT INTO `criancas` (`id`, `nome`, `idade`, `sexo`, `parto_natural`, `mae`, `
 -- --------------------------------------------------------
 
 --
--- Estrutura da tabela `usuarios`
+-- Table structure for table `usuarios`
 --
 
 CREATE TABLE `usuarios` (
@@ -86,7 +87,7 @@ CREATE TABLE `usuarios` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Extraindo dados da tabela `usuarios`
+-- Dumping data for table `usuarios`
 --
 
 INSERT INTO `usuarios` (`id`, `nome`, `login`, `senha`, `tentativas`, `bloqueado`) VALUES
@@ -95,25 +96,24 @@ INSERT INTO `usuarios` (`id`, `nome`, `login`, `senha`, `tentativas`, `bloqueado
 -- --------------------------------------------------------
 
 --
--- Estrutura da tabela `vacinas`
+-- Table structure for table `vacinas`
 --
 
 CREATE TABLE `vacinas` (
   `id` int(11) NOT NULL,
-  `lote` int(11) NOT NULL,
-  `nome` text NOT NULL,
-  `data_validade` date NOT NULL,
-  `fornecedor` text NOT NULL
+  `nome` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Extraindo dados da tabela `vacinas`
+-- Dumping data for table `vacinas`
 --
 
-INSERT INTO `vacinas` (`id`, `lote`, `nome`, `data_validade`, `fornecedor`) VALUES
-(1, 123, 'Febre Amarela', '2018-10-26', 'Bio-Manguinhos'),
-(2, 456, 'BCG', '2018-12-24', 'Sanofi'),
-(3, 789, 'Tétano', '2018-03-07', 'BRL Vacinas');
+INSERT INTO `vacinas` (`id`, `nome`) VALUES
+(2, 'BCG'),
+(1, 'Febre Amarela'),
+(5, 'Hepatite B'),
+(4, 'Influenza'),
+(3, 'Tétano');
 
 --
 -- Indexes for dumped tables
@@ -146,7 +146,7 @@ ALTER TABLE `usuarios`
 --
 ALTER TABLE `vacinas`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `lote` (`lote`);
+  ADD UNIQUE KEY `nome` (`nome`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -156,7 +156,7 @@ ALTER TABLE `vacinas`
 -- AUTO_INCREMENT for table `controle_vacinas`
 --
 ALTER TABLE `controle_vacinas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 --
 -- AUTO_INCREMENT for table `criancas`
 --
@@ -171,13 +171,13 @@ ALTER TABLE `usuarios`
 -- AUTO_INCREMENT for table `vacinas`
 --
 ALTER TABLE `vacinas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 --
 -- Constraints for dumped tables
 --
 
 --
--- Limitadores para a tabela `controle_vacinas`
+-- Constraints for table `controle_vacinas`
 --
 ALTER TABLE `controle_vacinas`
   ADD CONSTRAINT `fk_criancas` FOREIGN KEY (`crianca`) REFERENCES `criancas` (`id`),

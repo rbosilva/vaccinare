@@ -1,17 +1,16 @@
 <nav class="breadcrumb">
     <a href="" title="Ir para o Início"><i class="fa fa-home"></i> Início</a>
     <a href="" title="Ir para Controle de Vacinas" data-object="controle"> Controle de Vacinas</a>
-    <span class="active"><?php echo !isset($id) ? 'Novo' : 'Editar'; ?></span>
+    <span class="active">Novo</span>
 </nav>
 <div class="row">
     <div class="col-lg-12">
         <div class="panel panel-default">
             <div class="panel-heading">
-                <?php echo !isset($id) ? '<i class="fa fa-plus"></i> Novo Controle de Vacina' : '<i class="fa fa-pencil"></i> Editar Controle de Vacina'; ?>
+                <i class="fa fa-plus"></i> Novo Controle de Vacina
             </div>
             <div class="panel-body">
                 <form class="form-horizontal">
-                    <input type="hidden" name="id" value="<?php echo evaluate($dados['id']); ?>">
                     <div class="form-group">
                         <label for="crianca" class="control-label col-lg-2">Criança</label>
                         <div class="col-lg-10">

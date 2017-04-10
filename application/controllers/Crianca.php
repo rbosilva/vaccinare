@@ -57,7 +57,7 @@ class Crianca extends MY_Controller {
             $error = $this->db->error();
             if (stripos($error['message'], 'foreign key')) {
                 $this->response('error', 'Esta Criança já foi cadastrada no Controle de Vacinas, ' .
-                                         'é necessário excluí-la do Controle antes.');
+                                         'é necessário excluir seu vínculo antes.');
             }
             $this->response('error', $error['message']);
         }
