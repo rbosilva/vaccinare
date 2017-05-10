@@ -19,7 +19,7 @@
                             <th width="30">Idade</th>
                             <th width="15">Sexo</th>
                             <th width="50">Parto</th>
-                            <th>Mãe</th>
+                            <th width="250">Mãe</th>
                             <th width="50">Cor/Etnia</th>
                             <th width="30" class="no-sort">Editar</th>
                             <th width="30" class="no-sort">Excluir</th>
