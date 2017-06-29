@@ -5,6 +5,44 @@ $.extend($.fn.dataTable.defaults, {
     "fixedHeader": true,
     "processing": true,
     "serverSide": true,
+    "dom": '<"row"<"col-sm-6"l><"col-sm-6"f>>Brt<"row"<"col-sm-6"i><"col-sm-6"p>>',
+    "buttons": [
+        {
+            extend: 'pdf',
+            text: 'Exportar para PDF',
+            exportOptions: {
+                columns: ':not(.no-print)'
+            },
+            customize: function (win) {
+                win.content[0].text = $('.breadcrumb span.active').text();
+                win.content[1].table.widths = '*';
+            }
+        },
+        {
+            extend: 'excel',
+            text: 'Exportar para XLSX',
+            filename: function () {
+                return $('.breadcrumb span.active').text();
+            },
+            exportOptions: {
+                columns: ':not(.no-print)'
+            }
+        },
+        {
+            extend: 'print',
+            autoPrint: false,
+            text: 'Visualizar impressão',
+            exportOptions: {
+                columns: ':not(.no-print)'
+            },
+            customize: function (window) {
+                $(window.document.body).find('h1').remove();
+                $(window.document.body).prepend('<h3>' + $('.breadcrumb span.active').text() + '</h3>');
+                $(window.document.body).find('table').css('font-size', '12pt');
+                $(window.document.body).prepend('<button class="btn btn-outline btn-default" onclick="window.print();"><i class="fa fa-print"></i> <span>Imprimir</span></button>');
+            }
+        }
+    ],
     "columnDefs": [{
         targets: "no-sort",
         orderable: false,

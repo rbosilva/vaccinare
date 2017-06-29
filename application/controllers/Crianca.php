@@ -16,8 +16,8 @@ class Crianca extends MY_Controller {
             $data = $this->crianca->get_where($params['where'], $params['order_by'], $params['length'], $params['start']);
             $count_all = $this->crianca->count_all();
             $count_filtered = $this->crianca->count($params['where']);
-            formatVars($data);
-            echo formatResults($data, $count_all, $count_filtered, $params['draw']);
+            $results = formatVars($data);
+            echo formatResults($results, $count_all, $count_filtered, $params['draw']);
         } else {
             $this->load->view('crianca/list');
         }
@@ -28,8 +28,8 @@ class Crianca extends MY_Controller {
         if (!empty($id)) {
             $dados = $this->crianca->get($id);
         }
-        formatVars($dados);
-        $this->load->view('crianca/form', $dados);
+        $results = formatVars($dados);
+        $this->load->view('crianca/form', $results);
     }
     
     public function save() {
@@ -39,7 +39,7 @@ class Crianca extends MY_Controller {
             'cor_etnia' => 'in_list[Branca,Negra,Parda,Indígena,Amarela]'
         )));
         if ($this->form_validation->run()) {
-            if ($this->crianca->save($dados)) {
+            if ($this->crianca->save($dados) !== false) {
                 $this->response('success', 'Registro salvo com sucesso.');
             } else {
                 $error = $this->db->error();

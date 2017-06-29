@@ -3,11 +3,12 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class MY_Controller extends CI_Controller {
-
-    public function __construct() {
-        parent::__construct();
-    }
     
+    /**
+     * Retorna uma string em formato json com as informações passadas
+     * @param string $type O tipo de mensagem para o retorno, error para falha ou qualquer outra coisa para sucesso
+     * @param mixed $data Os dados para o retorno, pode ser uma variável ou array
+     */
     protected function response($type = 'success', $data = '') {
         $return = array(
             'info' => 1

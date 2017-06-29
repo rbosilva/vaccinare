@@ -10,99 +10,175 @@ class MY_Model extends CI_Model {
     
     public function __construct() {
         parent::__construct();
+        // Caso $this->table não esteja setada, usa o nome da classe
         if (empty($this->table)) {
             $this->table = strtolower(preg_replace('/(_model)$/i', 's', get_class($this)));
         }
+        // Caso $this->index não esteja setado, tenta encontrar o índice da tabela automaticamente
         if (empty($this->index)) {
             $this->index = $this->db->primary($this->table);
         }
     }
     
+    /**
+     * Seta o nome da tabela a qual a model está relacionada
+     * @param string $table
+     */
     protected function set_table($table) {
         if (!empty($table)) {
             $this->table = $table;
         }
     }
     
+    /**
+     * Retorna o nome da tabela a qual a model está relacionada
+     * @return string
+     */
     public function get_table() {
         return $this->table;
     }
     
+    /**
+     * Seta o nome do índice da tabela
+     * @param string $index
+     */
     protected function set_index($index) {
         if (!empty($index)) {
             $this->index = $index;
         }
     }
     
+    /**
+     * Retorna o nome do índice da tabela
+     * @return string
+     */
     public function get_index() {
         return $this->index;
     }
     
+    /**
+     * Seta as regras de validação dos dados
+     * @param array $rules
+     */
     protected function set_rules(array $rules) {
         $this->rules = $rules;
     }
     
+    /**
+     * Retorna as regras de validação dos dados
+     * @return array
+     */
     public function get_rules() {
         return $this->rules;
     }
     
-    public function save(array $data, $return_rows_updated = false) {
+    /**
+     * Se o índice da tabela for passado realiza um update,
+     * caso contrário realiza um insert
+     * @param array $data Os dados para inserção/alteração
+     * @return int O último índice inserido na tabela (quando for insert),
+     * o número de linhas afetadas (quando for update), ou false (em caso de falha)
+     */
+    public function save(array $data) {
         if (!empty($data) && is_array($data)) {
             if (isset($data[$this->index])) {
                 $index = $data[$this->index];
                 unset($data[$this->index]);
             }
             if (empty($index)) {
-                $this->db->insert($this->table, $data);
-                return $this->db->insert_id();
+                if ($this->db->insert($this->table, $data)) {
+                    return $this->db->insert_id();
+                }
             } else {
                 $this->db->where($this->index, $index);
-                $update = $this->db->update($this->table, $data);
-                return $return_rows_updated ? $this->db->affected_rows() : $update;
+                if ($this->db->update($this->table, $data)) {
+                    return $this->db->affected_rows();
+                }
             }
         }
         return false;
     }
     
-    public function delete($index, $return_rows = false) {
+    /**
+     * Deleta um registro da tabela a partir do seu índice
+     * @param int $index O valor do índice do registro
+     * @return boolean true em caso de sucesso ou false em caso de falha
+     */
+    public function delete($index) {
         if (isset($index)) {
-            $delete = $this->db->delete($this->table, array($this->index => $index));
-            return $return_rows ? $this->db->affected_rows() : $delete;
+            return $this->db->delete($this->table, array($this->index => $index));
         }
         return false;
     }
     
-    public function all($order_by = null, $result_type = 'array') {
+    /**
+     * Retorna todos os registros da tabela
+     * @param string $order_by Os campos para ordenação da consulta
+     * @param boolean $return_as_object Se passado como true retorna um objeto com os dados,
+     * caso contrário retorna um array
+     * @return mixed Um array ou objeto
+     */
+    public function all($order_by = null, $return_as_object = false) {
         $this->db->order_by($order_by);
-        if ($result_type == 'array') {
-            return $this->db->get($this->table)->result_array();
+        if ($return_as_object) {
+            return $this->db->get($this->table)->result();
         }
-        return $this->db->get($this->table)->result();
+        return $this->db->get($this->table)->result_array();
     }
     
-    public function get_where($where = null, $order_by = null, $limit = null, $offset = null, $result_type = 'array') {
+    /**
+     * Retorna todos os registros da tabela que se encaixarem nas codições especificadas
+     * @param array $where As condições para a consulta
+     * @param array $order_by Os campos para ordenação da consulta
+     * @param int $limit A quantidade máxima de registros que podem ser retornados
+     * @param int $offset A partir de que registro serão retornados
+     * @param boolean $return_as_object Se passado como true retorna um objeto com os dados,
+     * caso contrário retorna um array
+     * @return mixed Um array ou objeto
+     */
+    public function get_where($where = null, $order_by = null, $limit = null, $offset = null, $return_as_object = false) {
         $this->db->order_by($order_by);
-        if ($result_type == 'array') {
-            return $this->db->get_where($this->table, $where, $limit, $offset)->result_array();
+        if ($return_as_object) {
+            return $this->db->get_where($this->table, $where, $limit, $offset)->result();
         }
-        return $this->db->get_where($this->table, $where, $limit, $offset)->result();
+        return $this->db->get_where($this->table, $where, $limit, $offset)->result_array();
     }
     
-    public function get_first_where($where = null, $order_by = null, $result_type = 'array') {
+    /**
+     * Retorna o primeiro registro de uma consulta nas condições especificadas
+     * @param array $where As condições para a consulta
+     * @param array $order_by Os campos para ordenação da consulta
+     * @param boolean $return_as_object Se passado como true retorna um objeto com os dados,
+     * caso contrário retorna um array
+     * @return mixed Um array ou objeto
+     */
+    public function get_first_where($where = null, $order_by = null, $return_as_object = false) {
         $this->db->order_by($order_by);
-        if ($result_type === 'array') {
-            return $this->db->get_where($this->table, $where)->row_array();
+        if ($return_as_object) {
+            return $this->db->get_where($this->table, $where)->row();
         }
-        return $this->db->get_where($this->table, $where)->row();
+        return $this->db->get_where($this->table, $where)->row_array();
     }
     
-    public function get($index, $result_type = 'array') {
+    /**
+     * Retorna um registro da tabela a partir do seu índice
+     * @param int $index O valor do índice do registro desejado
+     * @param boolean $return_as_object Se passado como true retorna um objeto com os dados,
+     * caso contrário retorna um array
+     * @return mixed Um array ou false (em caso de falha)
+     */
+    public function get($index, $return_as_object = false) {
         if (isset($index)) {
-            return $this->get_first_where(array($this->index => $index), null, $result_type);
+            return $this->get_first_where(array($this->index => $index), null, $return_as_object);
         }
         return false;
     }
     
+    /**
+     * Conta todos os registros da consulta
+     * @param array $where As condições da consulta
+     * @return int
+     */
     public function count($where) {
         if (!empty($where)) {
             $this->db->where($where);
@@ -110,17 +186,32 @@ class MY_Model extends CI_Model {
         return $this->db->count_all_results($this->table);
     }
     
+    /**
+     * Conta todos os registros da tabela
+     * @return int
+     */
     public function count_all() {
         return $this->db->count_all($this->table);
     }
     
-    public function columns($result_type = 'array') {
-        if ($result_type == 'array') {
-            return $this->db->query("SHOW COLUMNS FROM $this->table")->result_array();
+    /**
+     * Retorna informações a respeito dos campos da tabela
+     * @param boolean $return_as_object Se passado como true retorna um objeto com os dados,
+     * caso contrário retorna um array
+     * @return mixed Um array ou objeto
+     */
+    public function columns($return_as_object = false) {
+        if ($return_as_object) {
+            return $this->db->query("SHOW COLUMNS FROM $this->table")->result();
         }
-        return $this->db->query("SHOW COLUMNS FROM $this->table")->result();
+        return $this->db->query("SHOW COLUMNS FROM $this->table")->result_array();
     }
     
+    /**
+     * Monta e retorna um conjunto de regras de validação a partir dos tipos de dados da tabela
+     * @param array $additional_rules Regras adicionais para o retorno
+     * @return array
+     */
     public function get_rules_from_db(array $additional_rules = array()) {
         $integer_types = array('INTEGER', 'INT', 'SMALLINT', 'TINYINT', 'MEDIUMINT', 'BIGINT');
         $float_types = array('DECIMAL', 'NUMERIC', 'FLOAT', 'DOUBLE');

@@ -16,7 +16,7 @@
                     <thead>
                         <tr>
                             <th>Nome</th>
-                            <th width="30" class="no-sort">Excluir</th>
+                            <th width="30" class="no-sort no-print">Excluir</th>
                         </tr>
                     </thead>
                     <tbody></tbody>

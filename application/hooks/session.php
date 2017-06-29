@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Checa se o usuário está logado
+ */
 function check_session() {
     $CI =& get_instance();
     $class = $CI->router->fetch_class();

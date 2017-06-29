@@ -5,7 +5,7 @@
  */
 
 /* Page */
-body {
+body:not(.dt-print-view) {
     background: #2E363F;
     font-family: "Open Sans", sans-serif;
     font-size: 12px;
@@ -354,4 +354,10 @@ button span {
 
 .modal .modal-body .container {
     width: 100%;
+}
+
+@media print {
+    .dt-print-view button {
+        visibility: hidden;
+    }
 }

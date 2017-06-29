@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Força o uso de SSL (HTTPS)
+ */
 function redirect_ssl() {
     $CI =& get_instance();
     // redirecting to ssl.

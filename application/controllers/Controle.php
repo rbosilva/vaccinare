@@ -18,8 +18,8 @@ class Controle extends MY_Controller {
             $data = $this->controle->get_where($params['where'], $params['order_by'], $params['length'], $params['start']);
             $count_all = $this->controle->count_all();
             $count_filtered = $this->controle->count($params['where']);
-            formatVars($data, array('id', 'id_crianca', 'id_vacina'));
-            echo formatResults($data, $count_all, $count_filtered, $params['draw'], function (&$row) {
+            $results = formatVars($data, array('id', 'id_crianca', 'id_vacina'));
+            echo formatResults($results, $count_all, $count_filtered, $params['draw'], function (&$row) {
                 $row['crianca'] = "<a href='#' title='Visualizar Criança' class='visualizar-crianca' data-id-crianca='$row[id_crianca]'>$row[crianca]</a>";
             });
         } else {
@@ -40,7 +40,7 @@ class Controle extends MY_Controller {
             $this->check_child($dados['crianca']);
             $this->check_vaccine($dados['vacina']);
             $this->check_dose($dados['crianca'], $dados['vacina'], $dados['dose'], $dados['data']);
-            if ($this->controle->save($dados)) {
+            if ($this->controle->save($dados) !== false) {
                 $this->response('success', 'Registro salvo com sucesso.');
             } else {
                 $error = $this->db->error();

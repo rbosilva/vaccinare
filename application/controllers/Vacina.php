@@ -16,8 +16,8 @@ class Vacina extends MY_Controller {
             $data = $this->vacina->get_where($params['where'], $params['order_by'], $params['length'], $params['start']);
             $count_all = $this->vacina->count_all();
             $count_filtered = $this->vacina->count($params['where']);
-            formatVars($data);
-            echo formatResults($data, $count_all, $count_filtered, $params['draw']);
+            $results = formatVars($data);
+            echo formatResults($results, $count_all, $count_filtered, $params['draw']);
         } else {
             $this->load->view('vacina/list');
         }
@@ -33,7 +33,7 @@ class Vacina extends MY_Controller {
             'nome' => 'is_unique[' . $this->vacina->get_table() . '.nome]'
         )));
         if ($this->form_validation->run()) {
-            if ($this->vacina->save($dados)) {
+            if ($this->vacina->save($dados) !== false) {
                 $this->response('success', 'Registro salvo com sucesso.');
             } else {
                 $error = $this->db->error();
