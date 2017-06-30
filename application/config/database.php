@@ -92,20 +92,20 @@ $db['default'] = array(
     'encrypt' => FALSE,
     'compress' => FALSE,
     'stricton' => FALSE,
-    'failover' => array(),
     'save_queries' => TRUE
 );
 
 $db['default']['failover'] = array(
     array(
+        'dsn' => '',
         'hostname' => 'localhost',
         'username' => 'aluno',
         'password' => 'aluno',
         'database' => 'aluno_vaccinare',
         'dbdriver' => 'mysqli',
         'dbprefix' => '',
-        'pconnect' => TRUE,
-        'db_debug' => TRUE,
+        'pconnect' => FALSE,
+        'db_debug' => (ENVIRONMENT !== 'production'),
         'cache_on' => FALSE,
         'cachedir' => '',
         'char_set' => 'utf8',
@@ -113,6 +113,7 @@ $db['default']['failover'] = array(
         'swap_pre' => '',
         'encrypt' => FALSE,
         'compress' => FALSE,
-        'stricton' => FALSE
+        'stricton' => FALSE,
+        'save_queries' => TRUE
     )
 );

@@ -1,8 +1,17 @@
 var System = {
+    /**
+     * Retorna a url do site Vaccinare. Opcionalmente adiciona mais algum trecho à url
+     * @param {String} url [optional]
+     * @returns {String}
+     */
     base_url: function (url) {
         var base_url = !location.origin ? location.protocol + "//" + location.host : location.origin;
         return base_url + '/' + location.pathname.split('/')[1] + '/' + (typeof url !== 'undefined' ? url : '');
     },
+    /**
+     * Exibe uma modal de alerta
+     * @param {Json} data Informações para configuração da modal
+     */
     alert: function (data) {
         var defaults = {
             msg_type: 'info',
@@ -24,6 +33,10 @@ var System = {
             });
         });
     },
+    /**
+     * Exibe uma modal de confirmação
+     * @param {Json} data Informações para configuração da modal
+     */
     confirm: function (data) {
         var defaults = {
             title: 'Confirmação',
@@ -53,6 +66,10 @@ var System = {
             });
         });
     },
+    /**
+     * Inicializa e configura diversos componentes na view
+     * @param {Json} settings Parâmetros para configuração dos componentes
+     */
     initializeComponents: function (settings) {
         var defaults = {
             content: $('#page-wrapper'),

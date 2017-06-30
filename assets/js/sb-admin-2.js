@@ -4,10 +4,12 @@
  * Licensed under MIT (https://github.com/BlackrockDigital/startbootstrap/blob/gh-pages/LICENSE)
  */
 
-//Loads the correct sidebar on window load,
-//collapses the sidebar on window resize.
-//Sets the min-height of #page-wrapper to window size
 $(function() {
+    /**
+     * Loads the correct sidebar on window load,
+     * collapses the sidebar on window resize.
+     * Sets the min-height of #page-wrapper to window size
+     */
     $(window).bind("load resize", function() {
         var topOffset = 50;
         var width = (this.window.innerWidth > 0) ? this.window.innerWidth : this.screen.width;
@@ -25,12 +27,18 @@ $(function() {
         }
     });
 
+    /**
+     * Caso a sessão expire, retorna para a página de login
+     */
     $(document).ajaxComplete(function () {
         if (arguments[1].responseText == 'session_expired') {
             document.location.replace(System.base_url());
         }
     });
 
+    /**
+     * Ações (Sidebar, Quick actions e Breadcrumb)
+     */
     $('body').on('click', '.sidebar a[data-object], .quick-actions button, .breadcrumb a[data-object]', function (e) {
         e.preventDefault();
         var objeto = $(this).data('object'),

@@ -214,7 +214,7 @@ class MY_Model extends CI_Model {
      */
     public function get_rules_from_db(array $additional_rules = array()) {
         $integer_types = array('INTEGER', 'INT', 'SMALLINT', 'TINYINT', 'MEDIUMINT', 'BIGINT');
-        $float_types = array('DECIMAL', 'NUMERIC', 'FLOAT', 'DOUBLE');
+        $double_types = array('DECIMAL', 'NUMERIC', 'FLOAT', 'DOUBLE');
         $columns = $this->columns();
         $return = array();
         foreach ($columns as $column) {
@@ -229,7 +229,7 @@ class MY_Model extends CI_Model {
             }
             if (in_array(strtoupper($type), $integer_types, true)) {
                 $rules[] = 'integer';
-            } else if (in_array(strtoupper($type), $float_types, true)) {
+            } else if (in_array(strtoupper($type), $double_types, true)) {
                 $rules[] = 'numeric';
             } else if (strtoupper($type) == 'DATE') {
                 $rules[] = 'date';

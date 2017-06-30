@@ -1,3 +1,7 @@
+/**
+ * Retorna os campos e valores do formulário
+ * @returns {Json|Boolean}
+ */
 $.fn.getFormData = function () {
     if (typeof $(this) === 'object' && $(this).is('form')) {
         var result = {},
@@ -23,6 +27,11 @@ $.fn.getFormData = function () {
     return false;
 };
 
+/**
+ * Retorna todas as informações passadas no atributo "data" da tr
+ * @param string id O nome do atributo que se deseja retornar
+ * @returns {Object|Boolean}
+ */
 $.fn.get_tr_data = function (id) {
     if (typeof $(this) === 'object') {
         if ($(this).closest('tr').is('.child')) {
@@ -33,6 +42,10 @@ $.fn.get_tr_data = function (id) {
     return false;
 };
 
+/**
+ * Retorna o html "externo" do elemento, ou seja, todo o seu conteúdo mais suas tags externas
+ * @returns {Boolean|String}
+ */
 $.fn.outerHtml = function () {
     if (typeof this === 'object') {
         return this.clone().wrap('<div>').parent().html();
