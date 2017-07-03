@@ -184,9 +184,6 @@ if (!function_exists('format_params')) {
     }
 }
 
-/*
-    Formata o retorno dos dados para o plugin Datatables
-*/
 if (!function_exists('format_results')) {
     /**
      * Retorna os dados formatados para serem enviados ao plugin Datatables
@@ -195,7 +192,7 @@ if (!function_exists('format_results')) {
      * @param int $recordsFiltered O total de registros filtrados
      * @param int $draw Parâmetro requerido pelo Datatables, basicamente é a
      * resposta do parametro "draw" recebido em format_params 
-     * @param callable $callback O callback que é aplicado durante a montagem do retorno
+     * @param callable $callback [optional] O callback que é aplicado durante a montagem do retorno
      * @return string
      */
     function formatResults(array $data, $recordsTotal, $recordsFiltered, $draw, $callback = null) {
